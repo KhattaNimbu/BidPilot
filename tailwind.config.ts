@@ -15,6 +15,17 @@ const config: Config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        navy: {
+          950: "#0a0e1a", // Canvas background
+          900: "#111726", // Card container background
+          800: "#1b2438", // Border color
+          700: "#26334d", // Pill/Button background
+        },
+        lime: {
+          400: "#a3e635", // Primary Electric Neon Lime
+          500: "#84cc16",
+          300: "#bef264",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
