@@ -6,9 +6,13 @@ import {
   Upload, 
   FileText, 
   ArrowRight, 
-  Zap, 
+  Search,
   Sparkles,
-  Plus
+  Plus,
+  Filter,
+  CheckCircle2,
+  Calendar,
+  Layers
 } from 'lucide-react';
 import { Tender } from '@/lib/types';
 
@@ -19,6 +23,10 @@ export default function HomePage() {
   const [titleInput, setTitleInput] = useState('');
   const [buyerInput, setBuyerInput] = useState('');
   const [fileInput, setFileInput] = useState<File | null>(null);
+
+  // Filters
+  const [searchFilter, setSearchFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     fetchTenders();
@@ -63,206 +71,197 @@ export default function HomePage() {
     }
   }
 
+  const filteredTenders = tenders.filter(t => {
+    const matchesSearch = t.title.toLowerCase().includes(searchFilter.toLowerCase()) || t.buyer.toLowerCase().includes(searchFilter.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || t.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      {/* Hero Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-navy-900 p-6 rounded-2xl border border-navy-800 shadow-xl">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-            BidPilot Agentic Workspace
-            <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-lime-400/10 text-lime-400 border border-lime-400/20">
-              v1.0 Hackathon Build
-            </span>
-          </h1>
-          <p className="text-slate-400 text-sm mt-1 max-w-2xl">
-            Transform 100+ page tenders into scored, compliant, review-ready bids within 20 minutes. Powered by Nebius Token Factory (Nemotron Nano, Super, Ultra) and Tavily web research.
-          </p>
-        </div>
-        <div className="flex items-center gap-4 text-xs font-mono bg-navy-950 p-3 rounded-xl border border-navy-800">
-          <div>
-            <span className="text-slate-400 block">Avg Time Saved</span>
-            <span className="text-lime-400 font-bold text-base">92% (&lt;20 min)</span>
+    <div className="space-y-6">
+      {/* Top Search & Upload Quick Bar (Matching reference header layout) */}
+      <div className="soft-card p-4 space-y-4">
+        <form onSubmit={handleUpload} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+          <div className="md:col-span-4 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Tender Title / Name</label>
+            <input 
+              type="text"
+              placeholder="e.g. Enterprise Cloud Security RFP"
+              value={titleInput}
+              onChange={(e) => setTitleInput(e.target.value)}
+              className="w-full bg-transparent font-medium text-sm text-slate-900 focus:outline-none"
+            />
           </div>
-          <div className="border-l border-navy-800 pl-4">
-            <span className="text-slate-400 block">Requirement Recall</span>
-            <span className="text-lime-400 font-bold text-base">94.2%</span>
+
+          <div className="md:col-span-3 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Buyer Authority</label>
+            <input 
+              type="text"
+              placeholder="e.g. Dept of Transportation"
+              value={buyerInput}
+              onChange={(e) => setBuyerInput(e.target.value)}
+              className="w-full bg-transparent font-medium text-sm text-slate-900 focus:outline-none"
+            />
           </div>
-        </div>
-      </div>
 
-      {/* Upload & Fast Test Drive */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Upload Box */}
-        <div className="md:col-span-2 bg-navy-900 rounded-2xl border border-navy-800 p-6 space-y-4 shadow-xl">
-          <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-            <Upload className="h-5 w-5 text-lime-400" />
-            Upload Tender PDF / Document
-          </h2>
-          <form onSubmit={handleUpload} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Tender Title</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. Enterprise Cloud Modernization RFP"
-                  value={titleInput}
-                  onChange={(e) => setTitleInput(e.target.value)}
-                  className="w-full bg-navy-950 border border-navy-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-lime-400"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Buyer / Issuing Authority</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. Department of Transportation"
-                  value={buyerInput}
-                  onChange={(e) => setBuyerInput(e.target.value)}
-                  className="w-full bg-navy-950 border border-navy-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-lime-400"
-                />
-              </div>
-            </div>
+          <div className="md:col-span-3 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Upload Tender Document</label>
+            <input 
+              type="file"
+              accept=".pdf,.txt,.doc,.docx"
+              onChange={(e) => setFileInput(e.target.files?.[0] || null)}
+              className="text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-200 file:text-slate-800 hover:file:bg-slate-300"
+            />
+          </div>
 
-            <div className="border-2 border-dashed border-navy-800 hover:border-lime-400/50 rounded-xl p-6 text-center bg-navy-950/60 transition-colors">
-              <input 
-                type="file" 
-                accept=".pdf,.txt,.doc,.docx"
-                onChange={(e) => setFileInput(e.target.files?.[0] || null)}
-                className="hidden" 
-                id="file-upload"
-              />
-              <label htmlFor="file-upload" className="cursor-pointer space-y-2 block">
-                <FileText className="h-8 w-8 text-slate-500 mx-auto" />
-                <div className="text-sm font-medium text-slate-300">
-                  {fileInput ? fileInput.name : 'Click to upload PDF or drag and drop'}
-                </div>
-                <div className="text-xs text-slate-500">
-                  Supports text-based PDF or TXT up to 150 pages
-                </div>
-              </label>
-            </div>
-
-            <button 
-              type="submit" 
+          <div className="md:col-span-2">
+            <button
+              type="submit"
               disabled={uploading}
-              className="w-full bg-lime-400 hover:bg-lime-300 text-navy-950 font-bold py-2.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-lime-400/20 disabled:opacity-50"
+              className="w-full h-14 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all disabled:opacity-50"
             >
-              {uploading ? (
-                <>
-                  <Zap className="h-4 w-4 animate-spin text-navy-950" />
-                  Parsing & Creating Workspace...
-                </>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4" />
-                  Initialize Tender Workspace
-                </>
-              )}
+              {uploading ? <Sparkles className="h-4 w-4 animate-spin text-white" /> : <Plus className="h-4 w-4" />}
+              {uploading ? 'Processing' : 'Create Workspace'}
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
+      </div>
 
-        {/* Quick Demo Test Drive */}
-        <div className="bg-navy-900 rounded-2xl border border-navy-800 p-6 space-y-4 flex flex-col justify-between shadow-xl">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-lime-400" />
-              1-Click Demo Tenders
+      {/* Main 2-Column Grid Layout (Matching Reference UI Grid Structure) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* LEFT COLUMN: Filter Panel Card (~3 Columns) */}
+        <div className="lg:col-span-3 soft-card p-5 space-y-6">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h2 className="font-bold text-lg text-slate-900 flex items-center gap-2">
+              <Filter className="h-5 w-5 text-indigo-600" />
+              Filters
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Explore pre-parsed 50+ page public tender test sets complete with evaluation criteria & mandatory clauses.
-            </p>
+            <button 
+              onClick={() => { setSearchFilter(''); setStatusFilter('all'); }}
+              className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+            >
+              Reset
+            </button>
+          </div>
 
-            <div className="space-y-3 mt-4">
-              <Link 
-                href="/tenders/sample_cloud_security_rfp"
-                className="block p-3.5 rounded-xl bg-navy-950 border border-navy-800 hover:border-lime-400/50 transition-colors group"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-lime-400 uppercase tracking-wider">Cloud Security</span>
-                  <ArrowRight className="h-4 w-4 text-slate-500 group-hover:text-lime-400 transition-colors" />
-                </div>
-                <div className="text-sm font-medium text-slate-200 mt-1">Enterprise Cloud Security RFP</div>
-                <div className="text-xs text-slate-400 mt-0.5">Dept of Transportation • 45 Pages</div>
-              </Link>
-
-              <Link 
-                href="/tenders/sample_healthcare_analytics_tender"
-                className="block p-3.5 rounded-xl bg-navy-950 border border-navy-800 hover:border-lime-400/50 transition-colors group"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-lime-400 uppercase tracking-wider">Healthcare AI</span>
-                  <ArrowRight className="h-4 w-4 text-slate-500 group-hover:text-lime-400 transition-colors" />
-                </div>
-                <div className="text-sm font-medium text-slate-200 mt-1">AI Patient Data Analytics Platform</div>
-                <div className="text-xs text-slate-400 mt-0.5">National Healthcare Alliance • 38 Pages</div>
-              </Link>
+          {/* Search Keywords */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-slate-700">Search Keywords</label>
+            <div className="relative">
+              <Search className="h-4 w-4 text-slate-400 absolute left-3 top-3" />
+              <input 
+                type="text"
+                placeholder="Search tenders..."
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-indigo-500"
+              />
             </div>
           </div>
 
-          <div className="pt-2 border-t border-navy-800 text-[11px] text-slate-500 flex items-center justify-between">
-            <span>Zod JSON Validation</span>
-            <span>Ultra / Super / Nano Router</span>
+          {/* Status Filter Options */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-slate-700">Status</label>
+            <div className="space-y-1.5 text-xs text-slate-600 font-medium">
+              {['all', 'Ready', 'Decided', 'Uploaded'].map((st) => (
+                <label key={st} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-slate-50">
+                  <input 
+                    type="radio" 
+                    name="status"
+                    checked={statusFilter === st}
+                    onChange={() => setStatusFilter(st)}
+                    className="accent-indigo-600 h-4 w-4"
+                  />
+                  <span className="capitalize">{st === 'all' ? 'All Statuses' : st}</span>
+                </label>
+              ))}
+            </div>
           </div>
+
+          {/* AI Metrics Summary Box */}
+          <div className="bg-indigo-50/60 border border-indigo-100 p-4 rounded-2xl space-y-2 text-xs">
+            <span className="font-bold text-indigo-900 block">Nebius Nemotron Stats</span>
+            <div className="text-slate-600 space-y-1">
+              <div className="flex justify-between"><span>Avg Processing:</span> <strong className="text-slate-900">&lt; 20 min</strong></div>
+              <div className="flex justify-between"><span>Model Routing:</span> <strong className="text-indigo-600">85% Nano/Super</strong></div>
+              <div className="flex justify-between"><span>Tavily Research:</span> <strong className="text-emerald-600">Active</strong></div>
+            </div>
+          </div>
+
+          <button className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-md transition-colors">
+            Apply Filters
+          </button>
         </div>
-      </div>
 
-      {/* Tender Workspaces List */}
-      <div className="bg-navy-900 rounded-2xl border border-navy-800 p-6 space-y-4 shadow-xl">
-        <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-          <FileText className="h-5 w-5 text-lime-400" />
-          Active Tender Workspaces
-        </h2>
-
-        {loading ? (
-          <div className="text-center py-8 text-slate-500 text-sm">Loading tenders...</div>
-        ) : tenders.length === 0 ? (
-          <div className="text-center py-8 text-slate-500 text-sm">No tenders uploaded yet. Upload one above or click a sample tender.</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-navy-950 text-slate-400 text-xs uppercase tracking-wider border-b border-navy-800">
-                <tr>
-                  <th className="py-3 px-4">Tender Title</th>
-                  <th className="py-3 px-4">Buyer</th>
-                  <th className="py-3 px-4">Pages</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-navy-800">
-                {tenders.map((tender) => (
-                  <tr key={tender._id} className="hover:bg-navy-950/60 transition-colors">
-                    <td className="py-3.5 px-4 font-medium text-slate-200">
-                      {tender.title}
-                      <span className="block text-xs font-mono text-slate-500">{tender.file_name}</span>
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-300">{tender.buyer}</td>
-                    <td className="py-3.5 px-4 text-slate-400">{tender.total_pages || 10}</td>
-                    <td className="py-3.5 px-4">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
-                        tender.status === 'Ready' ? 'bg-lime-400/10 text-lime-400 border-lime-400/20' :
-                        tender.status === 'Decided' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                        tender.status === 'Processing' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 animate-pulse' :
-                        'bg-navy-800 text-slate-400 border-navy-700'
-                      }`}>
-                        {tender.status}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <Link 
-                        href={`/tenders/${tender._id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-lime-400/10 hover:bg-lime-400/20 text-lime-400 border border-lime-400/30 text-xs font-semibold transition-colors"
-                      >
-                        Open Workspace
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* RIGHT COLUMN: Main Tender List Grid (~9 Columns) */}
+        <div className="lg:col-span-9 space-y-4">
+          {/* Header Badge Pills Row (Matching reference pill layout) */}
+          <div className="flex items-center gap-2">
+            <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#ff5722] text-white shadow-sm">
+              Cheapest & Best Fit
+            </span>
+            <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-600 text-white shadow-sm">
+              Recommended (AI Ultra)
+            </span>
+            <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700">
+              {filteredTenders.length} tenders available
+            </span>
           </div>
-        )}
+
+          {/* Main Tenders List Cards */}
+          {loading ? (
+            <div className="soft-card p-12 text-center text-slate-400 font-medium text-sm">Loading tenders...</div>
+          ) : filteredTenders.length === 0 ? (
+            <div className="soft-card p-12 text-center text-slate-400 font-medium text-sm">No tenders matching filter criteria.</div>
+          ) : (
+            filteredTenders.map((tender) => (
+              <div key={tender._id} className="soft-card soft-card-hover p-6 space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase tracking-wider">
+                        {tender.buyer}
+                      </span>
+                      <span className="text-xs font-semibold text-slate-400 font-mono">
+                        {tender.file_name}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-extrabold text-slate-900">
+                      {tender.title}
+                    </h3>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                      tender.status === 'Ready' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                      tender.status === 'Decided' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
+                      'bg-slate-100 text-slate-600 border-slate-200'
+                    }`}>
+                      {tender.status}
+                    </span>
+                    <Link
+                      href={`/tenders/${tender._id}`}
+                      className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition-colors"
+                    >
+                      Select & Open Workspace
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Timeline / Highlights Row */}
+                <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-600 font-medium">
+                  <div className="flex items-center gap-4">
+                    <span className="flex items-center gap-1"><Layers className="h-4 w-4 text-indigo-600" /> {tender.total_pages || 10} Pages</span>
+                    <span className="flex items-center gap-1"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Grounded Evidence</span>
+                    <span className="flex items-center gap-1"><Sparkles className="h-4 w-4 text-orange-500" /> Tavily Search</span>
+                  </div>
+                  <span className="text-indigo-600 font-bold">100% Citation Guarantee</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

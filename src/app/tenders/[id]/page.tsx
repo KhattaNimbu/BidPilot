@@ -19,7 +19,8 @@ import {
   ArrowLeft,
   Search,
   Layers,
-  ChevronRight
+  ChevronRight,
+  Filter
 } from 'lucide-react';
 import { Decision, Requirement, ScoreRecord, Tender } from '@/lib/types';
 
@@ -224,27 +225,27 @@ export default function SingleTenderPage() {
   const firstScore = scores.length > 0 ? scores[0] : null;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Top Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-navy-900 p-6 rounded-2xl border border-navy-800 shadow-xl">
+    <div className="space-y-6">
+      {/* Top Workspace Bar */}
+      <div className="soft-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Link href="/" className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1">
+            <Link href="/" className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1">
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Workspaces
             </Link>
           </div>
-          <h1 className="text-xl font-bold text-white mt-1 flex items-center gap-3">
+          <h1 className="text-2xl font-extrabold text-slate-900 mt-1 flex items-center gap-3">
             {tender?.title || 'Tender Workspace'}
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-lime-400/10 text-lime-400 border border-lime-400/20">
+            <span className="px-3 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
               {tender?.buyer || 'Government Agency'}
             </span>
           </h1>
-          <div className="flex items-center gap-4 text-xs text-slate-400 mt-1">
+          <div className="flex items-center gap-4 text-xs font-medium text-slate-500 mt-1">
             <span>File: {tender?.file_name}</span>
             <span>•</span>
             <span>Pages: {tender?.total_pages || 10}</span>
             <span>•</span>
-            <span>Status: <strong className="text-slate-200">{tender?.status || 'Uploaded'}</strong></span>
+            <span>Status: <strong className="text-slate-900">{tender?.status || 'Uploaded'}</strong></span>
           </div>
         </div>
 
@@ -252,580 +253,496 @@ export default function SingleTenderPage() {
           <a
             href={`/api/tenders/${tenderId}/export`}
             download
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-lime-400 text-navy-950 hover:bg-lime-300 font-bold text-xs transition-colors shadow-lg shadow-lime-400/20"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-colors"
           >
             <Download className="h-4 w-4" />
             Export Excel Matrix (.xlsx)
           </a>
           <button
             onClick={loadAllData}
-            className="p-2 rounded-xl bg-navy-950 hover:bg-navy-800 text-slate-300 border border-navy-800 transition-colors"
+            className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
             title="Refresh Workspace"
           >
-            <RefreshCw className="h-4 w-4 text-lime-400" />
+            <RefreshCw className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-navy-800 pb-2">
-        <button
-          onClick={() => setActiveTab('decision')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-            activeTab === 'decision'
-              ? 'bg-lime-400 text-navy-950 shadow-lg shadow-lime-400/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-navy-900'
-          }`}
-        >
-          <Sparkles className="h-4 w-4" />
-          F1. Bid / No-Bid Recommendation
-          {decision && (
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-              (decision.user_override || decision.recommendation) === 'Bid' ? 'bg-navy-950 text-lime-400' :
-              (decision.user_override || decision.recommendation) === 'Consider' ? 'bg-amber-500/20 text-amber-300' :
-              'bg-red-500/20 text-red-300'
-            }`}>
-              {decision.user_override || decision.recommendation}
-            </span>
-          )}
-        </button>
+      {/* Main 2-Column Grid Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* LEFT COLUMN: Filters & Requirements Panel (~3 Columns) */}
+        <div className="lg:col-span-3 soft-card p-5 space-y-6">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h2 className="font-bold text-lg text-slate-900 flex items-center gap-2">
+              <Filter className="h-5 w-5 text-indigo-600" />
+              Matrix Filters
+            </h2>
+            <button 
+              onClick={() => { setSearchQuery(''); setStatusFilter('all'); setTypeFilter('all'); }}
+              className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+            >
+              Reset
+            </button>
+          </div>
 
-        <button
-          onClick={() => setActiveTab('matrix')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-            activeTab === 'matrix'
-              ? 'bg-lime-400 text-navy-950 shadow-lg shadow-lime-400/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-navy-900'
-          }`}
-        >
-          <Layers className="h-4 w-4" />
-          F2 & F3. Compliance Matrix & Drafts
-          {requirements.length > 0 && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-navy-950 text-slate-300">
-              {requirements.length}
-            </span>
-          )}
-          {mandatoryGaps.length > 0 && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">
-              {mandatoryGaps.length} Gaps
-            </span>
-          )}
-        </button>
-
-        <button
-          onClick={() => setActiveTab('buyer')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-            activeTab === 'buyer'
-              ? 'bg-lime-400 text-navy-950 shadow-lg shadow-lime-400/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-navy-900'
-          }`}
-        >
-          <BarChart2 className="h-4 w-4" />
-          F4. Mock Buyer Evaluation
-          {latestScore && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-navy-950 text-lime-400">
-              {latestScore.overall}/100
-            </span>
-          )}
-        </button>
-      </div>
-
-      {/* TAB 1: BID / NO-BID DECISION (F1) */}
-      {activeTab === 'decision' && (
-        <div className="space-y-6">
-          {!decision ? (
-            <div className="bg-navy-900 rounded-2xl border border-navy-800 p-8 text-center space-y-4 shadow-xl">
-              <Sparkles className="h-10 w-10 text-lime-400 mx-auto" />
-              <h2 className="text-lg font-semibold text-slate-100">Run Bid / No-Bid Decision Agent</h2>
-              <p className="text-slate-400 text-sm max-w-md mx-auto">
-                Analyzes tender requirements against saved company profile capabilities, certifications, and live Tavily buyer web research within 2 minutes.
-              </p>
-              <button
-                onClick={runDecisionAgent}
-                disabled={deciding}
-                className="bg-lime-400 hover:bg-lime-300 text-navy-950 font-bold py-2.5 px-6 rounded-xl text-sm inline-flex items-center gap-2 transition-all shadow-lg shadow-lime-400/20 disabled:opacity-50"
-              >
-                {deciding ? (
-                  <>
-                    <Zap className="h-4 w-4 animate-spin text-navy-950" />
-                    Running Nemotron Ultra Reasoning & Tavily Search...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4" />
-                    Generate Bid/No-Bid Decision
-                  </>
-                )}
-              </button>
+          {/* Search Box */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-slate-700">Search Requirement</label>
+            <div className="relative">
+              <Search className="h-4 w-4 text-slate-400 absolute left-3 top-3" />
+              <input 
+                type="text"
+                placeholder="Req ID or text..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-indigo-500"
+              />
             </div>
-          ) : (
-            <div className="space-y-6">
-              {/* Recommendation Banner */}
-              <div className="bg-navy-900 border border-navy-800 p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl">
-                <div className="flex items-center gap-5">
-                  <div className="h-16 w-16 rounded-2xl bg-navy-950 border border-navy-800 flex items-center justify-center font-bold text-2xl text-lime-400 shrink-0">
-                    {decision.user_override || decision.recommendation}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                      Recommendation Verdict {decision.user_override && '(User Overridden)'}
-                    </div>
-                    <div className="text-2xl font-bold text-white mt-0.5">
-                      Strategic Fit Score: <span className="text-lime-400">{decision.fit_score} / 100</span>
-                    </div>
-                    <p className="text-xs text-slate-400 mt-1 max-w-xl">
-                      Estimated Effort: <strong className="text-slate-200">{decision.estimated_effort}</strong>
-                    </p>
-                  </div>
-                </div>
+          </div>
 
-                {/* User Override Buttons */}
-                <div className="space-y-2 text-right shrink-0">
-                  <span className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Override Verdict:</span>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => handleOverrideRecommendation('Bid')}
-                      className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
-                        (decision.user_override || decision.recommendation) === 'Bid'
-                          ? 'bg-lime-400 text-navy-950 font-bold'
-                          : 'bg-navy-950 text-slate-400 hover:text-slate-200 border border-navy-800'
-                      }`}
-                    >
-                      Bid
-                    </button>
-                    <button
-                      onClick={() => handleOverrideRecommendation('Consider')}
-                      className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
-                        (decision.user_override || decision.recommendation) === 'Consider'
-                          ? 'bg-amber-500 text-navy-950 font-bold'
-                          : 'bg-navy-950 text-slate-400 hover:text-slate-200 border border-navy-800'
-                      }`}
-                    >
-                      Consider
-                    </button>
-                    <button
-                      onClick={() => handleOverrideRecommendation('No-bid')}
-                      className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
-                        (decision.user_override || decision.recommendation) === 'No-bid'
-                          ? 'bg-red-500 text-white font-bold'
-                          : 'bg-navy-950 text-slate-400 hover:text-slate-200 border border-navy-800'
-                      }`}
-                    >
-                      No-Bid
-                    </button>
-                  </div>
-                </div>
-              </div>
+          {/* Type Filter */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-slate-700">Requirement Type</label>
+            <select 
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none"
+            >
+              <option value="all">All Types</option>
+              <option value="Mandatory">Mandatory Only</option>
+              <option value="Optional">Optional Only</option>
+            </select>
+          </div>
 
-              {/* Red Flags Card Grid */}
-              <div className="bg-navy-900 rounded-2xl border border-navy-800 p-6 space-y-4 shadow-xl">
-                <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-                  <ShieldAlert className="h-5 w-5 text-red-400" />
-                  Top Red Flags & Risk Clauses (Quoted from Tender)
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {decision.red_flags.map((rf, idx) => (
-                    <div key={idx} className="bg-navy-950 p-4 rounded-xl border border-navy-800 space-y-2 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between text-xs font-semibold text-red-400 mb-1">
-                          <span>Risk #{idx + 1}</span>
-                          <span className="px-2 py-0.5 rounded bg-navy-900 text-slate-400 font-mono text-[10px]">Page {rf.page}</span>
-                        </div>
-                        <p className="text-xs italic text-slate-300 bg-navy-900/80 p-2.5 rounded-lg border border-navy-800 font-mono">
-                          "{rf.clause}"
-                        </p>
-                      </div>
-                      <p className="text-xs text-slate-400 pt-2 border-t border-navy-800">
-                        <strong className="text-slate-300">Rationale:</strong> {rf.reason}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          {/* Status Filter */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-slate-700">Compliance Status</label>
+            <select 
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none"
+            >
+              <option value="all">All Statuses</option>
+              <option value="Met">Met Only</option>
+              <option value="Partial">Partial Only</option>
+              <option value="Gap">Gap Only</option>
+            </select>
+          </div>
 
-              {/* Tavily Cited Web Research */}
-              <div className="bg-navy-900 rounded-2xl border border-navy-800 p-6 space-y-4 shadow-xl">
-                <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-                  <ExternalLink className="h-5 w-5 text-lime-400" />
-                  Cited Buyer Intelligence (Powered by Tavily Web Search)
-                </h2>
-                <div className="space-y-3">
-                  {decision.sources.map((src, idx) => (
-                    <a
-                      key={idx}
-                      href={src.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="block p-4 rounded-xl bg-navy-950 border border-navy-800 hover:border-lime-400/50 transition-colors group"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold text-lime-400 group-hover:text-lime-300 flex items-center gap-1.5">
-                          {src.title}
-                          <ExternalLink className="h-3.5 w-3.5 opacity-70" />
-                        </span>
-                        <span className="text-[10px] font-mono text-slate-500 truncate max-w-xs">{src.url}</span>
-                      </div>
-                      <p className="text-xs text-slate-400 mt-1.5 line-clamp-2">
-                        {src.snippet}
-                      </p>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* TAB 2: COMPLIANCE MATRIX & DRAFT ANSWERS (F2 & F3) */}
-      {activeTab === 'matrix' && (
-        <div className="space-y-6">
-          {/* Action Header & Progress */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-navy-900 p-6 rounded-2xl border border-navy-800 shadow-xl">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-                <Layers className="h-5 w-5 text-lime-400" />
-                Requirement Extraction & Evidence-Backed Answers
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Chunks document by section, matches past bid library evidence, drafts answers with Nemotron Super, and judges status (Met / Partial / Gap).
-              </p>
-            </div>
+          {/* Action Trigger Buttons */}
+          <div className="pt-3 border-t border-slate-100 space-y-2">
             <button
               onClick={triggerProcessingJob}
               disabled={processing}
-              className="bg-lime-400 hover:bg-lime-300 text-navy-950 font-bold py-2.5 px-5 rounded-xl text-sm inline-flex items-center gap-2 transition-all shadow-lg shadow-lime-400/20 disabled:opacity-50 shrink-0"
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-md transition-colors disabled:opacity-50"
             >
-              {processing ? (
-                <>
-                  <Zap className="h-4 w-4 animate-spin text-navy-950" />
-                  Processing Job Active...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="h-4 w-4" />
-                  {requirements.length > 0 ? 'Re-run Requirements Extraction' : 'Extract Requirements & Build Matrix'}
-                </>
-              )}
+              {processing ? 'Extracting Job Active...' : 'Run Requirement Extraction'}
             </button>
-          </div>
-
-          {/* Job Progress Indicator */}
-          {processing && (
-            <div className="bg-navy-900 border border-lime-400/30 p-4 rounded-xl space-y-2">
-              <div className="flex items-center justify-between text-xs font-medium text-lime-400">
-                <span>{jobProgress.message || 'Extracting and judging requirements...'}</span>
-                <span>{jobProgress.progress}%</span>
-              </div>
-              <div className="w-full bg-navy-950 rounded-full h-2 overflow-hidden">
-                <div 
-                  className="bg-lime-400 h-full transition-all duration-300"
-                  style={{ width: `${jobProgress.progress}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Mandatory Gap Red Alert Banner */}
-          {mandatoryGaps.length > 0 && (
-            <div className="bg-red-950/40 border border-red-500/40 p-4 rounded-xl flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <ShieldAlert className="h-6 w-6 text-red-400 shrink-0" />
-                <div>
-                  <h3 className="text-sm font-bold text-red-200">
-                    CRITICAL: {mandatoryGaps.length} Mandatory Requirement Gaps Detected!
-                  </h3>
-                  <p className="text-xs text-red-300/80 mt-0.5">
-                    Mandatory items without evidence lead to immediate buyer disqualification. Accept edits or add evidence to resolve Gaps.
-                  </p>
-                </div>
-              </div>
-              <button 
-                onClick={() => { setStatusFilter('Gap'); setTypeFilter('Mandatory'); }}
-                className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-semibold text-xs rounded-xl shrink-0"
-              >
-                Show Mandatory Gaps
-              </button>
-            </div>
-          )}
-
-          {/* Controls: Search & Filters */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-navy-900 p-4 rounded-xl border border-navy-800">
-            <div className="relative w-full md:w-80">
-              <Search className="h-4 w-4 text-slate-500 absolute left-3 top-3" />
-              <input 
-                type="text"
-                placeholder="Search requirements or IDs..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-800 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-lime-400"
-              />
-            </div>
-
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <select 
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-navy-950 border border-navy-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-lime-400"
-              >
-                <option value="all">All Statuses</option>
-                <option value="Met">Met Only</option>
-                <option value="Partial">Partial Only</option>
-                <option value="Gap">Gap Only</option>
-              </select>
-
-              <select 
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="bg-navy-950 border border-navy-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-lime-400"
-              >
-                <option value="all">All Types</option>
-                <option value="Mandatory">Mandatory Only</option>
-                <option value="Optional">Optional Only</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Requirements Matrix Table */}
-          <div className="bg-navy-900 rounded-2xl border border-navy-800 overflow-hidden shadow-xl">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-navy-950 text-slate-400 uppercase tracking-wider border-b border-navy-800">
-                  <tr>
-                    <th className="py-3 px-4 w-20">ID</th>
-                    <th className="py-3 px-4 w-28">Type</th>
-                    <th className="py-3 px-4 w-24">Status</th>
-                    <th className="py-3 px-4">Requirement & Section</th>
-                    <th className="py-3 px-4">Draft Answer</th>
-                    <th className="py-3 px-4 w-20">Conf</th>
-                    <th className="py-3 px-4 text-right w-24">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-navy-800">
-                  {filteredReqs.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="text-center py-8 text-slate-500">
-                        {requirements.length === 0 ? 'No requirements extracted yet. Click "Extract Requirements & Build Matrix" above.' : 'No requirements match filter criteria.'}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredReqs.map((req) => (
-                      <tr 
-                        key={req._id} 
-                        className={`hover:bg-navy-950/80 transition-colors ${
-                          req.type === 'Mandatory' && req.status === 'Gap' ? 'bg-red-950/20' : ''
-                        }`}
-                      >
-                        <td className="py-3.5 px-4 font-mono font-bold text-slate-300">{req.req_id}</td>
-                        <td className="py-3.5 px-4">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-semibold border ${
-                            req.type === 'Mandatory' ? 'bg-amber-500/10 text-amber-300 border-amber-500/20' : 'bg-navy-950 text-slate-400 border-navy-800'
-                          }`}>
-                            {req.type}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border ${
-                            req.status === 'Met' ? 'bg-lime-400/10 text-lime-400 border-lime-400/20' :
-                            req.status === 'Partial' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                            'bg-red-500/20 text-red-300 border-red-500/30'
-                          }`}>
-                            {req.status === 'Met' && <CheckCircle2 className="h-3 w-3 text-lime-400" />}
-                            {req.status === 'Gap' && <XCircle className="h-3 w-3 text-red-400" />}
-                            {req.status}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-4 max-w-xs">
-                          <p className="font-medium text-slate-200 line-clamp-2">{req.text}</p>
-                          <span className="text-[10px] text-slate-500 block mt-0.5">
-                            {req.section} • Page {req.page}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-4 max-w-sm">
-                          {req.draft_answer ? (
-                            <p className="text-slate-300 line-clamp-2 italic">{req.draft_answer}</p>
-                          ) : (
-                            <span className="text-red-400/80 italic font-mono text-[11px]">Blank (Gap: No Evidence)</span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 font-mono text-slate-400">
-                          {Math.round(req.confidence * 100)}%
-                        </td>
-                        <td className="py-3.5 px-4 text-right">
-                          <button
-                            onClick={() => {
-                              setSelectedReq(req);
-                              setEditAnswerText(req.draft_answer);
-                            }}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-navy-950 hover:bg-navy-800 text-lime-400 border border-navy-800 text-[11px] font-semibold transition-colors"
-                          >
-                            <Edit3 className="h-3 w-3" />
-                            Review
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 3: MOCK BUYER EVALUATION (F4) */}
-      {activeTab === 'buyer' && (
-        <div className="space-y-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-navy-900 p-6 rounded-2xl border border-navy-800 shadow-xl">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-                <BarChart2 className="h-5 w-5 text-lime-400" />
-                Mock Buyer Evaluation & Score Predictor
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Evaluates the bid draft strictly using published tender criteria and weights via Nemotron Ultra. Re-score updates within 60 seconds.
-              </p>
-            </div>
             <button
               onClick={runMockScorer}
               disabled={scoring}
-              className="bg-lime-400 hover:bg-lime-300 text-navy-950 font-bold py-2.5 px-5 rounded-xl text-sm inline-flex items-center gap-2 transition-all shadow-lg shadow-lime-400/20 disabled:opacity-50 shrink-0"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-md transition-colors disabled:opacity-50"
             >
-              {scoring ? (
-                <>
-                  <Zap className="h-4 w-4 animate-spin text-navy-950" />
-                  Running Nemotron Ultra Evaluator...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4" />
-                  {latestScore ? 'Re-Score Draft' : 'Run Mock Buyer Scoring'}
-                </>
-              )}
+              {scoring ? 'Scoring Draft...' : 'Run Mock Buyer Scoring'}
+            </button>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN: Main Workspace Views (~9 Columns) */}
+        <div className="lg:col-span-9 space-y-6">
+          {/* Top Pill Navigation Tabs */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setActiveTab('decision')}
+              className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shadow-sm ${
+                activeTab === 'decision'
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              F1. Bid / No-Bid Recommendation
+            </button>
+
+            <button
+              onClick={() => setActiveTab('matrix')}
+              className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shadow-sm ${
+                activeTab === 'matrix'
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              F2 & F3. Compliance Matrix ({requirements.length})
+            </button>
+
+            <button
+              onClick={() => setActiveTab('buyer')}
+              className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shadow-sm ${
+                activeTab === 'buyer'
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              F4. Buyer Evaluator {latestScore && `(${latestScore.overall}/100)`}
             </button>
           </div>
 
-          {!latestScore ? (
-            <div className="bg-navy-900 rounded-2xl border border-navy-800 p-8 text-center space-y-4 shadow-xl">
-              <BarChart2 className="h-10 w-10 text-lime-400 mx-auto" />
-              <h3 className="text-base font-semibold text-slate-200">No Evaluation Record Yet</h3>
-              <p className="text-slate-400 text-xs max-w-md mx-auto">
-                Click "Run Mock Buyer Scoring" above to extract tender criteria and predict buyer evaluation scores.
-              </p>
-            </div>
-          ) : (
+          {/* TAB 1: BID / NO-BID DECISION (F1) */}
+          {activeTab === 'decision' && (
             <div className="space-y-6">
-              {/* Score Overview Banner */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-navy-900 p-6 rounded-2xl border border-navy-800 flex flex-col justify-between shadow-xl">
-                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Predicted Buyer Score</span>
-                  <div className="text-4xl font-bold text-lime-400 my-2">
-                    {latestScore.overall} <span className="text-lg text-slate-500 font-normal">/ 100</span>
-                  </div>
-                  <span className="text-xs text-slate-400">Evaluation Version #{latestScore.version}</span>
+              {!decision ? (
+                <div className="soft-card p-10 text-center space-y-4">
+                  <Sparkles className="h-10 w-10 text-indigo-600 mx-auto" />
+                  <h2 className="text-lg font-bold text-slate-900">Run Bid / No-Bid Decision Agent</h2>
+                  <p className="text-slate-500 text-xs max-w-md mx-auto">
+                    Analyzes tender requirements against saved company profile capabilities, certifications, and live Tavily buyer web research.
+                  </p>
+                  <button
+                    onClick={runDecisionAgent}
+                    disabled={deciding}
+                    className="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-md transition-all disabled:opacity-50"
+                  >
+                    {deciding ? 'Running Nemotron Ultra...' : 'Generate Decision'}
+                  </button>
                 </div>
-
-                <div className="bg-navy-900 p-6 rounded-2xl border border-navy-800 flex flex-col justify-between shadow-xl">
-                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Before vs After Revisions</span>
-                  <div className="flex items-center gap-4 my-2">
-                    <div>
-                      <span className="text-xs text-slate-500 block">Initial</span>
-                      <span className="text-xl font-bold text-slate-400">{firstScore?.overall || latestScore.overall}</span>
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-lime-400" />
-                    <div>
-                      <span className="text-xs text-lime-400 block">Current</span>
-                      <span className="text-xl font-bold text-lime-400">{latestScore.overall}</span>
-                    </div>
-                  </div>
-                  <span className="text-xs text-lime-400 font-semibold">
-                    +{Math.max(0, latestScore.overall - (firstScore?.overall || latestScore.overall))} points improved
-                  </span>
-                </div>
-
-                <div className="bg-navy-900 p-6 rounded-2xl border border-navy-800 flex flex-col justify-between shadow-xl">
-                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Model Used</span>
-                  <div className="text-lg font-bold text-slate-200 my-2 flex items-center gap-2">
-                    <Zap className="h-4 w-4 text-lime-400" />
-                    Nemotron Ultra
-                  </div>
-                  <span className="text-xs text-slate-400">Deep procurement judgment</span>
-                </div>
-              </div>
-
-              {/* Per-Criterion Breakdown */}
-              <div className="bg-navy-900 rounded-2xl border border-navy-800 p-6 space-y-4 shadow-xl">
-                <h3 className="text-md font-semibold text-slate-100">Criterion-by-Criterion Evaluation</h3>
-                <div className="space-y-4">
-                  {latestScore.per_criterion.map((c, idx) => (
-                    <div key={idx} className="bg-navy-950 p-4 rounded-xl border border-navy-800 space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-semibold text-slate-200">{c.name} ({c.weight}% Weight)</span>
-                        <span className="font-mono font-bold text-lime-400">{c.score} / 100</span>
+              ) : (
+                <div className="space-y-6">
+                  {/* Verdict Card */}
+                  <div className="soft-card p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div className="flex items-center gap-5">
+                      <div className="h-16 w-16 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center font-extrabold text-2xl text-indigo-600 shrink-0">
+                        {decision.user_override || decision.recommendation}
                       </div>
-                      <div className="w-full bg-navy-900 rounded-full h-2 overflow-hidden">
-                        <div 
-                          className="bg-lime-400 h-full rounded-full transition-all"
-                          style={{ width: `${c.score || 0}%` }}
-                        />
+                      <div>
+                        <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                          Recommendation Verdict {decision.user_override && '(User Overridden)'}
+                        </div>
+                        <div className="text-2xl font-extrabold text-slate-900 mt-0.5">
+                          Strategic Fit Score: <span className="text-indigo-600">{decision.fit_score} / 100</span>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1">
+                          Estimated Effort: <strong className="text-slate-800">{decision.estimated_effort}</strong>
+                        </p>
                       </div>
-                      <p className="text-xs text-slate-400 italic">
-                        "{c.justification}"
+                    </div>
+
+                    {/* Override Buttons */}
+                    <div className="space-y-2 text-right shrink-0">
+                      <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Override Verdict:</span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => handleOverrideRecommendation('Bid')}
+                          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                            (decision.user_override || decision.recommendation) === 'Bid'
+                              ? 'bg-orange-500 text-white'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          Bid
+                        </button>
+                        <button
+                          onClick={() => handleOverrideRecommendation('Consider')}
+                          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                            (decision.user_override || decision.recommendation) === 'Consider'
+                              ? 'bg-indigo-600 text-white'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          Consider
+                        </button>
+                        <button
+                          onClick={() => handleOverrideRecommendation('No-bid')}
+                          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                            (decision.user_override || decision.recommendation) === 'No-bid'
+                              ? 'bg-slate-900 text-white'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          No-Bid
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Red Flags Card Grid */}
+                  <div className="soft-card p-6 space-y-4">
+                    <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <ShieldAlert className="h-5 w-5 text-red-500" />
+                      Top Red Flags & Risk Clauses (Quoted from Tender)
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {decision.red_flags.map((rf, idx) => (
+                        <div key={idx} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between text-xs font-bold text-red-600 mb-1">
+                              <span>Risk #{idx + 1}</span>
+                              <span className="px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-200 font-mono text-[10px]">Page {rf.page}</span>
+                            </div>
+                            <p className="text-xs italic text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 font-mono">
+                              "{rf.clause}"
+                            </p>
+                          </div>
+                          <p className="text-xs text-slate-600 pt-2 border-t border-slate-200">
+                            <strong className="text-slate-800">Rationale:</strong> {rf.reason}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tavily Cited Web Research */}
+                  <div className="soft-card p-6 space-y-4">
+                    <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <ExternalLink className="h-5 w-5 text-indigo-600" />
+                      Cited Buyer Intelligence (Powered by Tavily Web Search)
+                    </h2>
+                    <div className="space-y-3">
+                      {decision.sources.map((src, idx) => (
+                        <a
+                          key={idx}
+                          href={src.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-indigo-300 transition-colors group"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-bold text-indigo-600 group-hover:text-indigo-800 flex items-center gap-1.5">
+                              {src.title}
+                              <ExternalLink className="h-3.5 w-3.5 opacity-70" />
+                            </span>
+                            <span className="text-[10px] font-mono text-slate-400 truncate max-w-xs">{src.url}</span>
+                          </div>
+                          <p className="text-xs text-slate-600 mt-1.5 line-clamp-2">
+                            {src.snippet}
+                          </p>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 2: COMPLIANCE MATRIX (F2 & F3) */}
+          {activeTab === 'matrix' && (
+            <div className="space-y-6">
+              {mandatoryGaps.length > 0 && (
+                <div className="bg-red-50 border border-red-200 p-4 rounded-2xl flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <ShieldAlert className="h-6 w-6 text-red-600 shrink-0" />
+                    <div>
+                      <h3 className="text-sm font-bold text-red-900">
+                        CRITICAL: {mandatoryGaps.length} Mandatory Requirement Gaps Detected!
+                      </h3>
+                      <p className="text-xs text-red-700 mt-0.5">
+                        Mandatory items without evidence lead to immediate buyer disqualification. Accept edits or add evidence to resolve Gaps.
                       </p>
                     </div>
-                  ))}
+                  </div>
+                  <button 
+                    onClick={() => { setStatusFilter('Gap'); setTypeFilter('Mandatory'); }}
+                    className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-full shrink-0 shadow-sm"
+                  >
+                    Show Mandatory Gaps
+                  </button>
                 </div>
-              </div>
+              )}
 
-              {/* Top 3 Score Boost Suggestions */}
-              <div className="bg-navy-900 rounded-2xl border border-navy-800 p-6 space-y-4 shadow-xl">
-                <h3 className="text-md font-semibold text-slate-100 flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-lime-400" />
-                  Top 3 Recommended Fixes to Maximize Score
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {latestScore.suggestions.map((sug, idx) => (
-                    <div key={idx} className="bg-navy-950 p-4 rounded-xl border border-lime-400/20 space-y-2">
-                      <span className="text-xs font-bold text-lime-400 uppercase tracking-wider block">Fix #{idx + 1}</span>
-                      <p className="text-xs text-slate-300">{sug}</p>
-                    </div>
-                  ))}
+              {/* Requirements Matrix Table */}
+              <div className="soft-card overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider border-b border-slate-200 font-bold">
+                      <tr>
+                        <th className="py-3 px-4 w-20">ID</th>
+                        <th className="py-3 px-4 w-28">Type</th>
+                        <th className="py-3 px-4 w-24">Status</th>
+                        <th className="py-3 px-4">Requirement & Section</th>
+                        <th className="py-3 px-4">Draft Answer</th>
+                        <th className="py-3 px-4 w-20">Conf</th>
+                        <th className="py-3 px-4 text-right w-24">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 font-medium">
+                      {filteredReqs.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="text-center py-8 text-slate-400">
+                            No requirements extracted yet or matching filter criteria.
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredReqs.map((req) => (
+                          <tr 
+                            key={req._id} 
+                            className={`hover:bg-slate-50 transition-colors ${
+                              req.type === 'Mandatory' && req.status === 'Gap' ? 'bg-red-50/50' : ''
+                            }`}
+                          >
+                            <td className="py-3.5 px-4 font-mono font-bold text-slate-800">{req.req_id}</td>
+                            <td className="py-3.5 px-4">
+                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                                req.type === 'Mandatory' ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-slate-100 text-slate-600 border-slate-200'
+                              }`}>
+                                {req.type}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                                req.status === 'Met' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                req.status === 'Partial' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                'bg-red-50 text-red-700 border-red-200'
+                              }`}>
+                                {req.status === 'Met' && <CheckCircle2 className="h-3 w-3 text-emerald-600" />}
+                                {req.status === 'Gap' && <XCircle className="h-3 w-3 text-red-600" />}
+                                {req.status}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 max-w-xs">
+                              <p className="font-semibold text-slate-900 line-clamp-2">{req.text}</p>
+                              <span className="text-[10px] text-slate-400 block mt-0.5">
+                                {req.section} • Page {req.page}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 max-w-sm">
+                              {req.draft_answer ? (
+                                <p className="text-slate-600 line-clamp-2 italic">{req.draft_answer}</p>
+                              ) : (
+                                <span className="text-red-500 italic font-mono text-[11px]">Blank (Gap: No Evidence)</span>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 font-mono text-slate-600">
+                              {Math.round(req.confidence * 100)}%
+                            </td>
+                            <td className="py-3.5 px-4 text-right">
+                              <button
+                                onClick={() => {
+                                  setSelectedReq(req);
+                                  setEditAnswerText(req.draft_answer);
+                                }}
+                                className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold transition-colors shadow-sm"
+                              >
+                                <Edit3 className="h-3 w-3" />
+                                Review
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
           )}
-        </div>
-      )}
 
-      {/* REQUIREMENT EDIT DRAWER / MODAL */}
+          {/* TAB 3: MOCK BUYER SCORER (F4) */}
+          {activeTab === 'buyer' && (
+            <div className="space-y-6">
+              {!latestScore ? (
+                <div className="soft-card p-10 text-center space-y-4">
+                  <BarChart2 className="h-10 w-10 text-indigo-600 mx-auto" />
+                  <h3 className="text-base font-bold text-slate-900">No Evaluation Record Yet</h3>
+                  <p className="text-slate-500 text-xs max-w-md mx-auto">
+                    Click "Run Mock Buyer Scoring" in the left sidebar to extract tender criteria and predict buyer evaluation scores.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="soft-card p-6 flex flex-col justify-between">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Predicted Buyer Score</span>
+                      <div className="text-4xl font-extrabold text-indigo-600 my-2">
+                        {latestScore.overall} <span className="text-lg text-slate-400 font-normal">/ 100</span>
+                      </div>
+                      <span className="text-xs text-slate-500 font-medium">Evaluation Version #{latestScore.version}</span>
+                    </div>
+
+                    <div className="soft-card p-6 flex flex-col justify-between">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Before vs After Revisions</span>
+                      <div className="flex items-center gap-4 my-2">
+                        <div>
+                          <span className="text-xs text-slate-400 block">Initial</span>
+                          <span className="text-xl font-bold text-slate-500">{firstScore?.overall || latestScore.overall}</span>
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-indigo-600" />
+                        <div>
+                          <span className="text-xs text-emerald-600 block font-bold">Current</span>
+                          <span className="text-xl font-extrabold text-emerald-600">{latestScore.overall}</span>
+                        </div>
+                      </div>
+                      <span className="text-xs text-emerald-600 font-bold">
+                        +{Math.max(0, latestScore.overall - (firstScore?.overall || latestScore.overall))} points improved
+                      </span>
+                    </div>
+
+                    <div className="soft-card p-6 flex flex-col justify-between">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Model Used</span>
+                      <div className="text-lg font-extrabold text-slate-900 my-2 flex items-center gap-2">
+                        <Zap className="h-4 w-4 text-indigo-600" />
+                        Nemotron Ultra
+                      </div>
+                      <span className="text-xs text-slate-500 font-medium">Deep procurement judgment</span>
+                    </div>
+                  </div>
+
+                  {/* Criteria Breakdown */}
+                  <div className="soft-card p-6 space-y-4">
+                    <h3 className="text-md font-bold text-slate-900">Criterion-by-Criterion Evaluation</h3>
+                    <div className="space-y-4">
+                      {latestScore.per_criterion.map((c, idx) => (
+                        <div key={idx} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="font-bold text-slate-900">{c.name} ({c.weight}% Weight)</span>
+                            <span className="font-mono font-bold text-indigo-600">{c.score} / 100</span>
+                          </div>
+                          <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                            <div 
+                              className="bg-indigo-600 h-full rounded-full transition-all"
+                              style={{ width: `${c.score || 0}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-slate-600 italic">
+                            "{c.justification}"
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* REQUIREMENT EDIT MODAL */}
       {selectedReq && (
-        <div className="fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-navy-900 border border-navy-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="soft-card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl">
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-xs font-mono font-bold text-lime-400">{selectedReq.req_id}</span>
-                <h3 className="text-base font-bold text-white mt-0.5">{selectedReq.text}</h3>
-                <span className="text-xs text-slate-400">
-                  {selectedReq.section} • Page {selectedReq.page} • Type: <strong className="text-slate-200">{selectedReq.type}</strong>
+                <span className="text-xs font-mono font-bold text-indigo-600">{selectedReq.req_id}</span>
+                <h3 className="text-base font-bold text-slate-900 mt-0.5">{selectedReq.text}</h3>
+                <span className="text-xs text-slate-500">
+                  {selectedReq.section} • Page {selectedReq.page} • Type: <strong className="text-slate-800">{selectedReq.type}</strong>
                 </span>
               </div>
               <button 
                 onClick={() => setSelectedReq(null)}
-                className="text-slate-400 hover:text-white text-lg font-bold"
+                className="text-slate-400 hover:text-slate-800 text-lg font-bold"
               >
                 ✕
               </button>
             </div>
 
-            {/* Evidence Found Box */}
-            <div className="bg-navy-950 p-4 rounded-xl border border-navy-800 space-y-2">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Evidence Sources Retrieved</span>
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Evidence Sources Retrieved</span>
               {selectedReq.evidence.length === 0 ? (
-                <span className="text-xs text-red-400 italic">No direct evidence found in company profile or past bids library.</span>
+                <span className="text-xs text-red-500 italic">No direct evidence found in company profile or past bids library.</span>
               ) : (
                 <div className="space-y-2">
                   {selectedReq.evidence.map((ev, idx) => (
-                    <div key={idx} className="text-xs text-slate-300 p-2 rounded bg-navy-900 border border-navy-800 font-mono">
+                    <div key={idx} className="text-xs text-slate-700 p-2.5 rounded-xl bg-white border border-slate-200 font-mono">
                       {ev}
                     </div>
                   ))}
@@ -833,9 +750,8 @@ export default function SingleTenderPage() {
               )}
             </div>
 
-            {/* Draft Answer Editor */}
             <div className="space-y-2">
-              <label className="block text-xs font-semibold text-slate-300">
+              <label className="block text-xs font-bold text-slate-700">
                 Draft Response (Accept, Edit, or Regenerate)
               </label>
               <textarea
@@ -843,18 +759,17 @@ export default function SingleTenderPage() {
                 value={editAnswerText}
                 onChange={(e) => setEditAnswerText(e.target.value)}
                 placeholder="No evidence available. Enter manual answer..."
-                className="w-full bg-navy-950 border border-navy-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-lime-400 font-sans"
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs text-slate-800 focus:outline-none focus:border-indigo-500 font-sans font-medium"
               />
             </div>
 
-            {/* Controls */}
-            <div className="flex items-center justify-between pt-3 border-t border-navy-800">
+            <div className="flex items-center justify-between pt-3 border-t border-slate-100">
               <button
                 onClick={() => handleSaveEdit('regenerate')}
                 disabled={savingEdit}
-                className="px-3.5 py-2 rounded-xl bg-navy-950 hover:bg-navy-800 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-navy-800 disabled:opacity-50"
+                className="px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors disabled:opacity-50"
               >
-                <RotateCcw className="h-3.5 w-3.5 text-lime-400" />
+                <RotateCcw className="h-3.5 w-3.5 text-indigo-600" />
                 Regenerate Answer
               </button>
 
@@ -862,7 +777,7 @@ export default function SingleTenderPage() {
                 <button
                   onClick={() => handleSaveEdit('edit')}
                   disabled={savingEdit}
-                  className="px-4 py-2 rounded-xl bg-navy-950 hover:bg-navy-800 text-slate-200 text-xs font-semibold border border-navy-800 transition-colors disabled:opacity-50"
+                  className="px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors disabled:opacity-50"
                 >
                   Save Edit
                 </button>
@@ -870,7 +785,7 @@ export default function SingleTenderPage() {
                 <button
                   onClick={() => handleSaveEdit('accept')}
                   disabled={savingEdit}
-                  className="px-4 py-2 rounded-xl bg-lime-400 hover:bg-lime-300 text-navy-950 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-lg shadow-lime-400/20 disabled:opacity-50"
+                  className="px-5 py-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-md disabled:opacity-50"
                 >
                   <Check className="h-3.5 w-3.5" />
                   Accept & Save to Past-Bid Library

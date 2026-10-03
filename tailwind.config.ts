@@ -15,16 +15,17 @@ const config: Config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        canvas: "#f1f4f9",
         navy: {
-          950: "#0a0e1a", // Canvas background
-          900: "#111726", // Card container background
-          800: "#1b2438", // Border color
-          700: "#26334d", // Pill/Button background
+          950: "#0b0f19",
+          900: "#0f172a", // Dark midnight navy for primary buttons & main text
+          800: "#1e293b",
+          700: "#334155",
         },
-        lime: {
-          400: "#a3e635", // Primary Electric Neon Lime
-          500: "#84cc16",
-          300: "#bef264",
+        pill: {
+          orange: "#ff5722", // High contrast orange accent badge
+          blue: "#4f46e5",   // Royal blue badge
+          gray: "#f1f5f9",   // Soft gray neutral badge
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
@@ -52,6 +53,9 @@ const config: Config = {
         },
       },
       borderRadius: {
+        '3xl': '1.5rem',
+        '2xl': '1.25rem',
+        xl: '0.875rem',
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",

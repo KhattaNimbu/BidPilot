@@ -110,15 +110,15 @@ export default function KnowledgePage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-navy-900 p-6 rounded-2xl border border-navy-800 shadow-xl">
+      <div className="soft-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <BookOpen className="h-6 w-6 text-lime-400" />
+          <h1 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+            <BookOpen className="h-6 w-6 text-indigo-600" />
             Company Knowledge Base & Past Bids Library
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 font-medium mt-1">
             Grounds BidPilot agents (F1 decision & F3 drafting) with authoritative company capabilities, certifications, and historical winning answers.
           </p>
         </div>
@@ -126,67 +126,67 @@ export default function KnowledgePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Company Profile Form */}
-        <div className="bg-navy-900 rounded-2xl border border-navy-800 p-6 space-y-4 shadow-xl">
-          <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-lime-400" />
+        <div className="soft-card p-6 space-y-4">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-indigo-600" />
             Company Credentials & Certifications Profile
           </h2>
 
-          <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
+          <form onSubmit={handleSaveProfile} className="space-y-4 text-xs font-medium">
             <div>
-              <label className="block font-medium text-slate-300 mb-1">Company Name</label>
+              <label className="block font-bold text-slate-700 mb-1">Company Name</label>
               <input 
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-lime-400"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
               />
             </div>
 
             <div>
-              <label className="block font-medium text-slate-300 mb-1">Capabilities (1 per line)</label>
+              <label className="block font-bold text-slate-700 mb-1">Capabilities (1 per line)</label>
               <textarea 
                 rows={4}
                 value={capabilities}
                 onChange={(e) => setCapabilities(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-lime-400 font-mono"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-indigo-500 font-mono"
               />
             </div>
 
             <div>
-              <label className="block font-medium text-slate-300 mb-1">Certifications (1 per line)</label>
+              <label className="block font-bold text-slate-700 mb-1">Certifications (1 per line)</label>
               <textarea 
                 rows={3}
                 value={certifications}
                 onChange={(e) => setCertifications(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-lime-400 font-mono"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-indigo-500 font-mono"
               />
             </div>
 
             <div>
-              <label className="block font-medium text-slate-300 mb-1">Past Wins & Case Studies (1 per line)</label>
+              <label className="block font-bold text-slate-700 mb-1">Past Wins & Case Studies (1 per line)</label>
               <textarea 
                 rows={3}
                 value={pastWins}
                 onChange={(e) => setPastWins(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-lime-400 font-mono"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-indigo-500 font-mono"
               />
             </div>
 
             <div>
-              <label className="block font-medium text-slate-300 mb-1">Capacity Notes</label>
+              <label className="block font-bold text-slate-700 mb-1">Capacity Notes</label>
               <input 
                 type="text"
                 value={capacityNotes}
                 onChange={(e) => setCapacityNotes(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-lime-400"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
               />
             </div>
 
             <button
               type="submit"
               disabled={savingProfile}
-              className="w-full bg-lime-400 hover:bg-lime-300 text-navy-950 font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors shadow-lg shadow-lime-400/20 disabled:opacity-50"
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors shadow-md disabled:opacity-50"
             >
               <Save className="h-4 w-4" />
               {savingProfile ? 'Saving Profile...' : 'Save Company Profile'}
@@ -197,26 +197,26 @@ export default function KnowledgePage() {
         {/* Past Bids Library */}
         <div className="space-y-6">
           {/* Add Past Bid Form */}
-          <div className="bg-navy-900 rounded-2xl border border-navy-800 p-6 space-y-4 shadow-xl">
-            <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-              <Plus className="h-5 w-5 text-lime-400" />
+          <div className="soft-card p-6 space-y-4">
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <Plus className="h-5 w-5 text-indigo-600" />
               Add Past Winning Bid Answer
             </h2>
-            <form onSubmit={handleAddPastBid} className="space-y-3 text-xs">
+            <form onSubmit={handleAddPastBid} className="space-y-3 text-xs font-medium">
               <div className="grid grid-cols-2 gap-3">
                 <input 
                   type="text"
                   placeholder="Bid Title e.g. Dept of Defense Cloud Bid"
                   value={newBidTitle}
                   onChange={(e) => setNewBidTitle(e.target.value)}
-                  className="w-full bg-navy-950 border border-navy-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-lime-400"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                 />
                 <input 
                   type="text"
                   placeholder="Buyer e.g. Dept of Defense"
                   value={newBidBuyer}
                   onChange={(e) => setNewBidBuyer(e.target.value)}
-                  className="w-full bg-navy-950 border border-navy-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-lime-400"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
@@ -225,13 +225,13 @@ export default function KnowledgePage() {
                 placeholder="Requirement & Answer Pair e.g. Requirement: Must be ISO 27001 certified. Answer: Apex maintains certified ISO 27001..."
                 value={newBidQA}
                 onChange={(e) => setNewBidQA(e.target.value)}
-                className="w-full bg-navy-950 border border-navy-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-lime-400 font-mono"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-indigo-500 font-mono"
               />
 
               <button
                 type="submit"
                 disabled={addingBid}
-                className="w-full bg-lime-400 hover:bg-lime-300 text-navy-950 font-bold py-2 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors shadow-md disabled:opacity-50"
               >
                 <Plus className="h-3.5 w-3.5" />
                 {addingBid ? 'Adding to Library...' : 'Save Answer to Knowledge Base'}
@@ -240,25 +240,25 @@ export default function KnowledgePage() {
           </div>
 
           {/* Past Bids List */}
-          <div className="bg-navy-900 rounded-2xl border border-navy-800 p-6 space-y-4 shadow-xl">
-            <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-              <FileText className="h-5 w-5 text-lime-400" />
+          <div className="soft-card p-6 space-y-4">
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <FileText className="h-5 w-5 text-indigo-600" />
               Indexed Past Bids & Evidence Chunks
             </h2>
 
             <div className="space-y-3">
               {pastBids.map((bid, idx) => (
-                <div key={idx} className="bg-navy-950 p-4 rounded-xl border border-navy-800 space-y-2">
+                <div key={idx} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-slate-200">{bid.title}</span>
-                    <span className="px-2 py-0.5 rounded bg-lime-400/10 text-lime-400 border border-lime-400/20 text-[10px] font-bold">
+                    <span className="font-bold text-slate-900">{bid.title}</span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                       {bid.outcome}
                     </span>
                   </div>
-                  <span className="text-[10px] text-slate-500 block">Buyer: {bid.buyer}</span>
+                  <span className="text-[10px] text-slate-500 font-medium block">Buyer: {bid.buyer}</span>
                   <div className="space-y-1 pt-1">
                     {bid.chunks.map((chunk, cIdx) => (
-                      <div key={cIdx} className="text-[11px] text-slate-300 p-2 rounded bg-navy-900 border border-navy-800 font-mono line-clamp-3">
+                      <div key={cIdx} className="text-[11px] text-slate-700 p-2.5 rounded-xl bg-white border border-slate-200 font-mono line-clamp-3">
                         {chunk.text}
                       </div>
                     ))}

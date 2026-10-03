@@ -3,56 +3,74 @@
 @tailwind utilities;
 
 :root {
-  /* Dark Navy Canvas matching reference design */
-  --background: 224 45% 6%;
-  --foreground: 210 40% 98%;
+  /* Light cool gray/blue canvas matching reference design */
+  --background: 216 30% 96%; /* #f1f4f9 */
+  --foreground: 222 47% 11%; /* #0f172a */
 
-  /* Dark Navy Elevated Containers */
-  --card: 222 38% 11%;
-  --card-foreground: 210 40% 98%;
+  /* Pure White Elevated Containers */
+  --card: 0 0% 100%; /* #ffffff */
+  --card-foreground: 222 47% 11%;
 
-  /* Subtle Card Borders */
-  --border: 220 28% 18%;
-  --input: 220 28% 18%;
+  /* Soft Light Card Borders & Inputs */
+  --border: 214 32% 91%; /* #e2e8f0 */
+  --input: 214 32% 91%;
 
-  /* Electric Neon Lime Primary Accent */
-  --primary: 84 81% 55%;
-  --primary-foreground: 224 45% 6%;
+  /* Dark Navy Primary Action Button */
+  --primary: 222 47% 11%; /* #0f172a */
+  --primary-foreground: 0 0% 100%;
 
-  /* Secondary Navy Elements */
-  --secondary: 222 30% 15%;
-  --secondary-foreground: 210 40% 98%;
+  /* Secondary Elements */
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222 47% 11%;
 
-  --muted: 222 30% 15%;
-  --muted-foreground: 215 20% 65%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
 
-  --accent: 84 81% 55%;
-  --accent-foreground: 224 45% 6%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222 47% 11%;
 
-  --destructive: 0 84% 60%;
+  --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
 
-  --radius: 0.875rem;
+  --radius: 1rem;
 }
 
 body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #f1f4f9;
+  color: #0f172a;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Custom scrollbars */
+/* Soft card shadow like reference UI */
+.soft-card {
+  background-color: #ffffff;
+  border-radius: 1.25rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+}
+
+.soft-card-hover {
+  transition: all 0.2s ease-in-out;
+}
+.soft-card-hover:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+}
+
+/* Custom scrollbars for light mode */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+  background: #f1f4f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
+  background: #cbd5e1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary));
+  background: #94a3b8;
 }

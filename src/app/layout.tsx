@@ -2,13 +2,12 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Link from 'next/link';
 import { 
-  FileText, 
-  BarChart3, 
-  BookOpen, 
   Cpu, 
-  Zap, 
   Search,
-  Bot
+  Bot,
+  Settings,
+  Bell,
+  User
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -22,99 +21,76 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="flex h-screen overflow-hidden bg-navy-950 text-slate-100">
-        {/* Sidebar */}
-        <aside className="w-64 border-r border-navy-800 bg-navy-900/90 flex flex-col justify-between p-4 shrink-0">
-          <div className="space-y-6">
+    <html lang="en">
+      <body className="min-h-screen bg-[#f1f4f9] text-slate-800 antialiased flex flex-col">
+        {/* Top Header Bar matching reference design */}
+        <header className="sticky top-0 z-40 bg-[#f1f4f9]/90 backdrop-blur-md px-6 py-3 border-b border-slate-200/80">
+          <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-6">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 px-2">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-lime-500 via-lime-400 to-emerald-400 p-0.5 shadow-lg shadow-lime-500/20">
-                <div className="h-full w-full bg-navy-950 rounded-[10px] flex items-center justify-center">
-                  <Bot className="h-5 w-5 text-lime-400" />
-                </div>
+            <Link href="/" className="flex items-center gap-2.5 shrink-0">
+              <div className="h-9 w-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+                <Bot className="h-5 w-5" />
               </div>
-              <div>
-                <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-lime-400 bg-clip-text text-transparent">
-                  BidPilot
-                </span>
-                <span className="block text-[10px] font-semibold text-lime-400 uppercase tracking-widest">
-                  Agentic Tender Hub
-                </span>
-              </div>
+              <span className="font-extrabold text-xl tracking-tight text-slate-900">
+                bidpilot
+              </span>
             </Link>
 
-            {/* Navigation */}
-            <nav className="space-y-1">
+            {/* Top Navigation Bar Pill Tabs */}
+            <nav className="hidden md:flex items-center gap-1 bg-white/80 p-1.5 rounded-full border border-slate-200/80 shadow-sm text-xs font-semibold text-slate-600">
               <Link 
                 href="/" 
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-navy-800/80 transition-colors"
+                className="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-900 transition-all font-semibold"
               >
-                <FileText className="h-4 w-4 text-lime-400" />
                 Tender Workspaces
               </Link>
               <Link 
                 href="/knowledge" 
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-navy-800/80 transition-colors"
+                className="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-900 transition-all font-semibold"
               >
-                <BookOpen className="h-4 w-4 text-lime-400" />
                 Company & Past Bids
               </Link>
               <Link 
                 href="/observability" 
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-navy-800/80 transition-colors"
+                className="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-900 transition-all font-semibold"
               >
-                <BarChart3 className="h-4 w-4 text-lime-400" />
                 Observability & Traces
               </Link>
             </nav>
-          </div>
 
-          {/* Infrastructure badges */}
-          <div className="space-y-3 pt-4 border-t border-navy-800/80 text-xs">
-            <div className="flex items-center justify-between px-2 text-slate-400">
-              <span className="flex items-center gap-1.5 text-slate-300">
-                <Cpu className="h-3.5 w-3.5 text-lime-400" />
-                Nebius Token Factory
-              </span>
-              <span className="px-2 py-0.5 rounded text-[10px] bg-lime-400/10 text-lime-400 border border-lime-400/20 font-mono font-semibold">
-                Nemotron
-              </span>
-            </div>
-            <div className="flex items-center justify-between px-2 text-slate-400">
-              <span className="flex items-center gap-1.5 text-slate-300">
-                <Search className="h-3.5 w-3.5 text-lime-400" />
-                Tavily Search SDK
-              </span>
-              <span className="px-2 py-0.5 rounded text-[10px] bg-lime-400/10 text-lime-400 border border-lime-400/20 font-mono font-semibold">
-                Active
-              </span>
+            {/* Infrastructure Badges & Profile */}
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="hidden lg:flex items-center gap-2 text-xs font-medium text-slate-600 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">
+                <span className="flex items-center gap-1 text-slate-800">
+                  <Cpu className="h-3.5 w-3.5 text-indigo-600" />
+                  Nebius Token Factory
+                </span>
+                <span className="text-slate-300">|</span>
+                <span className="flex items-center gap-1 text-slate-800">
+                  <Search className="h-3.5 w-3.5 text-indigo-600" />
+                  Tavily Search
+                </span>
+              </div>
+
+              {/* Action Icons */}
+              <button className="h-9 w-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 shadow-sm transition-colors">
+                <Settings className="h-4 w-4" />
+              </button>
+              <button className="h-9 w-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 shadow-sm transition-colors relative">
+                <Bell className="h-4 w-4" />
+                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-orange-500" />
+              </button>
+              <div className="h-9 w-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-semibold text-xs shadow-md">
+                <User className="h-4 w-4" />
+              </div>
             </div>
           </div>
-        </aside>
+        </header>
 
-        {/* Main Content Area */}
-        <main className="flex-1 flex flex-col overflow-hidden bg-navy-950">
-          {/* Header */}
-          <header className="h-16 border-b border-navy-800 bg-navy-900/60 px-6 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2 text-sm text-slate-400">
-              <span className="font-semibold text-slate-200">Track:</span> Best Apps & Agents (Nebius x NVIDIA)
-              <span className="text-navy-800">|</span>
-              <span className="text-lime-400 font-medium">Bonus: Best Use of Tavily</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-lime-400/10 text-lime-400 border border-lime-400/20">
-                <Zap className="h-3 w-3" />
-                Model Router: Nano (80%) + Super + Ultra
-              </span>
-            </div>
-          </header>
-
-          {/* Page Body */}
-          <div className="flex-1 overflow-y-auto p-6">
-            {children}
-          </div>
-        </main>
+        {/* Page Container */}
+        <div className="flex-1 max-w-[1440px] w-full mx-auto p-6">
+          {children}
+        </div>
       </body>
     </html>
   );
