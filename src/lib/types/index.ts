@@ -74,6 +74,9 @@ export interface LLMCall {
   input_preview?: string;
   output_preview?: string;
   timestamp: string;
+  is_mock?: boolean;
+  error?: string;
+  retry_count?: number;
 }
 
 export interface Tender {
