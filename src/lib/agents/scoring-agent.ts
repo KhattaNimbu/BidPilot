@@ -2,6 +2,7 @@ import { ScoreRecord, EvaluationCriterion } from '../types';
 import { dbService } from '../db';
 import { runRoutedLLM } from '../llm/router';
 import { BuyerScorerSchema, TenderCriteriaExtractorSchema } from '../schemas/agents';
+import { splitTextIntoSections } from '../services/pdf';
 
 export async function runMockBuyerScorer(tenderId: string): Promise<ScoreRecord> {
   const tender = await dbService.getTender(tenderId);
@@ -12,18 +13,32 @@ export async function runMockBuyerScorer(tenderId: string): Promise<ScoreRecord>
   const requirements = await dbService.getRequirements(tenderId);
   const existingScores = await dbService.getScores(tenderId);
   const nextVersion = existingScores.length + 1;
+  const sections = splitTextIntoSections(tender.file_content || "", tender.total_pages || 10);
 
   // 1. Extract or fetch evaluation criteria
   let criteria: EvaluationCriterion[] = tender.evaluation_criteria || [];
 
   if (criteria.length === 0) {
+    // Find sections that mention evaluation, award, criteria, weights, or scoring
+    const evalSections = sections.filter(s => 
+      /evaluation|award|criteria|scoring|weight|basis/i.test(s.title) ||
+      /evaluation criteria|award criteria|percentage weight|scoring method/i.test(s.content)
+    );
+
+    const evalTextContent = evalSections.length > 0 
+      ? evalSections.map(s => `[${s.title}]\n${s.content}`).join('\n\n')
+      : sections.map(s => `[${s.title}]\n${s.content.slice(0, 400)}`).join('\n\n');
+
     const extractPrompt = `
-TENDER TEXT EXCERPT:
-${(tender.file_content || "").substring(0, 3500)}
+TENDER TITLE: ${tender.title}
+BUYER: ${tender.buyer}
+
+EVALUATION & AWARD SECTIONS (EXTRACTED ACROSS TENDER):
+${evalTextContent.slice(0, 6000)}
 
 TASK:
-Extract the evaluation criteria and their respective percentage weights (e.g., Technical 40%, Security 30%, SLA 30%).
-If weights are not explicitly listed in text, infer reasonable default weights summing to 100%.
+Extract the official tender evaluation criteria and percentage weights (summing to 100%).
+If weights are not explicitly quantified in the text, extract the stated evaluation factors and assign balanced weights reflecting their stated priority in the text.
 
 Return JSON:
 {
@@ -54,12 +69,23 @@ Return JSON:
     await dbService.updateTender(tenderId, { evaluation_criteria: criteria });
   }
 
-  // Build draft response summary for buyer evaluation
-  const draftSummary = requirements.map(r => `
-[${r.req_id}] Section: ${r.section} | Type: ${r.type} | Status: ${r.status}
-Requirement: ${r.text}
-Draft Answer: ${r.draft_answer || 'NONE (GAP)'}
-  `).join('\n---\n');
+  // Build full draft response digest organized by compliance status
+  const gaps = requirements.filter(r => r.status === 'Gap');
+  const partials = requirements.filter(r => r.status === 'Partial');
+  const mets = requirements.filter(r => r.status === 'Met');
+
+  const draftSummary = `
+TOTAL REQUIREMENTS: ${requirements.length} (Met: ${mets.length}, Partial: ${partials.length}, Gaps: ${gaps.length})
+
+GAPS / UNADDRESSED (${gaps.length}):
+${gaps.map(r => `- [${r.req_id}] (${r.type}) ${r.text}`).slice(0, 20).join('\n') || 'None'}
+
+PARTIAL COMPLIANCE (${partials.length}):
+${partials.map(r => `- [${r.req_id}] ${r.text}\n  Draft: ${r.draft_answer}`).slice(0, 15).join('\n') || 'None'}
+
+MET REQUIREMENTS SAMPLE (${mets.length}):
+${mets.map(r => `- [${r.req_id}] ${r.text}\n  Draft: ${r.draft_answer.slice(0, 200)}...`).slice(0, 10).join('\n')}
+`;
 
   const scorerPrompt = `
 TENDER TITLE: ${tender.title}
@@ -68,16 +94,17 @@ BUYER: ${tender.buyer}
 EVALUATION CRITERIA & WEIGHTS:
 ${criteria.map(c => `- ${c.name}: ${c.weight}%`).join('\n')}
 
-FULL DRAFT RESPONSES:
-${draftSummary.substring(0, 5000)}
+COMPLIANCE & DRAFT RESPONSES DIGEST:
+${draftSummary}
 
 TASK:
 You are the Buyer's Evaluation Board. Act as a strict, impartial procurement evaluator.
-Score our bid draft for EACH criterion on a scale of 0 to 100 based strictly on completeness, compliance, and evidence.
+Score our proposal draft for EACH criterion on a scale of 0 to 100 based strictly on evidence completeness and gaps.
+Dock heavy points for mandatory Gaps or missing certifications.
 Calculate the overall weighted score (0 to 100).
 Identify the TOP 3 specific changes that would raise our score most.
 
-Return JSON adhering strictly to:
+Return JSON strictly:
 {
   "per_criterion": [
     {

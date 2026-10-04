@@ -2,7 +2,7 @@ import { RelevantEvidence } from '../services/embeddings';
 import { runRoutedLLM } from '../llm/router';
 import { DraftAnswerSchema } from '../schemas/agents';
 import { dbService } from '../db';
-import { Requirement } from '../types';
+import { Requirement, RequirementStatus } from '../types';
 
 export interface DraftResult {
   answer: string;
@@ -62,16 +62,31 @@ Return JSON:
 export async function acceptAndSaveRequirementEdit(
   reqId: string,
   newAnswer: string,
-  reviewerState: 'Accepted' | 'Edited'
+  reviewerState: 'Accepted' | 'Edited',
+  overrideStatus?: RequirementStatus
 ): Promise<Requirement | null> {
+  const trimmed = newAnswer.trim();
+
+  // Compliance status evaluation for edited response
+  let computedStatus: RequirementStatus = overrideStatus || 'Met';
+  if (!overrideStatus) {
+    if (trimmed.length === 0 || /cannot comply|not compliant|non-compliant|gap|unsupported|decline/i.test(trimmed)) {
+      computedStatus = 'Gap';
+    } else if (trimmed.length < 25 || /partial|pending review|subject to waiver|investigating/i.test(trimmed)) {
+      computedStatus = 'Partial';
+    } else {
+      computedStatus = 'Met';
+    }
+  }
+
   const updated = await dbService.updateRequirement(reqId, {
     draft_answer: newAnswer,
     reviewer_state: reviewerState,
-    status: newAnswer.trim().length > 0 ? 'Met' : 'Gap'
+    status: computedStatus
   });
 
-  if (updated && newAnswer.trim().length > 0) {
-    // Save accepted edit back to past-bid library for future learning check (PRD F3 acceptance criteria)
+  if (updated && computedStatus === 'Met' && trimmed.length > 0) {
+    // Save verified compliant edit back to past-bid library for future learning check (PRD F3 acceptance criteria)
     await dbService.addPastBid({
       title: `Accepted Edit - ${updated.section}`,
       buyer: 'Internal Library Update',
