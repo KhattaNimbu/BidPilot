@@ -54,6 +54,23 @@ export async function POST(req: Request) {
       buyer = (formData.get('buyer') as string) || 'Department of Transportation';
 
       if (file) {
+        // Enforce 50MB maximum upload limit
+        const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
+        if (file.size > MAX_FILE_SIZE_BYTES) {
+          return NextResponse.json({ 
+            error: `File size exceeds 50MB limit (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please upload a smaller PDF or text extract.` 
+          }, { status: 413 });
+        }
+
+        // Validate allowed file extensions
+        const allowedExtensions = ['.pdf', '.txt', '.doc', '.docx'];
+        const hasValidExt = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+        if (!hasValidExt) {
+          return NextResponse.json({ 
+            error: `Invalid file format for '${file.name}'. Only PDF and TXT tender documents are supported.` 
+          }, { status: 400 });
+        }
+
         fileName = file.name;
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
