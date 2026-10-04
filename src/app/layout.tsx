@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import './globals.css';
 import Link from 'next/link';
 import { 
@@ -9,6 +10,13 @@ import {
   Bell,
   User
 } from 'lucide-react';
+import { isMockModeActive } from '@/lib/llm/router';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
   title: 'BidPilot - Agentic Tender Workspace',
@@ -20,19 +28,21 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const isMock = isMockModeActive();
+
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-[#f1f4f9] text-slate-800 antialiased flex flex-col">
+    <html lang="en" className={inter.variable}>
+      <body className={`${inter.className} min-h-screen bg-[#f1f4f9] text-slate-800 antialiased flex flex-col font-sans`}>
         {/* Top Header Bar matching reference design */}
         <header className="sticky top-0 z-40 bg-[#f1f4f9]/90 backdrop-blur-md px-6 py-3 border-b border-slate-200/80">
           <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-6">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 shrink-0">
-              <div className="h-9 w-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+              <div className="h-9 w-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
                 <Bot className="h-5 w-5" />
               </div>
               <span className="font-extrabold text-xl tracking-tight text-slate-900">
-                bidpilot
+                BidPilot
               </span>
             </Link>
 
@@ -40,34 +50,46 @@ export default function RootLayout({
             <nav className="hidden md:flex items-center gap-1 bg-white/80 p-1.5 rounded-full border border-slate-200/80 shadow-sm text-xs font-semibold text-slate-600">
               <Link 
                 href="/" 
-                className="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-900 transition-all font-semibold"
+                className="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-900 transition-all font-medium"
               >
                 Tender Workspaces
               </Link>
               <Link 
                 href="/knowledge" 
-                className="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-900 transition-all font-semibold"
+                className="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-900 transition-all font-medium"
               >
                 Company & Past Bids
               </Link>
               <Link 
                 href="/observability" 
-                className="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-900 transition-all font-semibold"
+                className="px-4 py-2 rounded-full hover:bg-slate-100 hover:text-slate-900 transition-all font-medium"
               >
                 Observability & Traces
               </Link>
             </nav>
 
-            {/* Infrastructure Badges & Profile */}
+            {/* Infrastructure Badges & Engine State */}
             <div className="flex items-center gap-3 shrink-0">
+              {isMock ? (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-300 text-xs font-bold shadow-sm">
+                  <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                  MOCK MODE ACTIVE
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 text-xs font-bold shadow-sm">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  LIVE ENGINE (Nebius & Tavily)
+                </div>
+              )}
+
               <div className="hidden lg:flex items-center gap-2 text-xs font-medium text-slate-600 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">
-                <span className="flex items-center gap-1 text-slate-800">
-                  <Cpu className="h-3.5 w-3.5 text-indigo-600" />
+                <span className="flex items-center gap-1 text-slate-800 font-semibold">
+                  <Cpu className="h-3.5 w-3.5 text-blue-600" />
                   Nebius Token Factory
                 </span>
                 <span className="text-slate-300">|</span>
-                <span className="flex items-center gap-1 text-slate-800">
-                  <Search className="h-3.5 w-3.5 text-indigo-600" />
+                <span className="flex items-center gap-1 text-slate-800 font-semibold">
+                  <Search className="h-3.5 w-3.5 text-blue-600" />
                   Tavily Search
                 </span>
               </div>

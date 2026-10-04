@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   /* Light cool gray/blue canvas matching reference design */
   --background: 216 30% 96%; /* #f1f4f9 */
   --foreground: 222 47% 11%; /* #0f172a */
@@ -15,8 +18,8 @@
   --border: 214 32% 91%; /* #e2e8f0 */
   --input: 214 32% 91%;
 
-  /* Dark Navy Primary Action Button */
-  --primary: 222 47% 11%; /* #0f172a */
+  /* Dark Navy & SolaceUI Royal Blue Primary */
+  --primary: 221 83% 53%; /* #2563eb */
   --primary-foreground: 0 0% 100%;
 
   /* Secondary Elements */
@@ -32,14 +35,22 @@
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
 
-  --radius: 1rem;
+  --radius: 0.875rem;
 }
 
 body {
   background-color: #f1f4f9;
   color: #0f172a;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01';
+  letter-spacing: -0.011em;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.03em;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01';
 }
 
 /* Soft card shadow like reference UI */

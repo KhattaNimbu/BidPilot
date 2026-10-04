@@ -78,11 +78,35 @@ export default function HomePage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* SolaceUI Reference Style Hero Banner */}
+      <div className="pt-4 pb-6 text-center max-w-4xl mx-auto space-y-4">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-[-0.035em] leading-[1.1]">
+          AI Agents That Bid<br />Like Your Best Bid Team
+        </h1>
+        <p className="text-base sm:text-lg text-slate-600 font-normal max-w-2xl mx-auto leading-relaxed">
+          Autonomous agents that parse 100+ page tenders, extract compliance matrices, draft evidence-backed answers, and score bids with Nebius Nemotron & Tavily.
+        </p>
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <a 
+            href="#upload-card" 
+            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-lg shadow-sm hover:shadow transition-all"
+          >
+            Create Workspace
+          </a>
+          <Link 
+            href="/observability" 
+            className="px-6 py-2.5 bg-white hover:bg-slate-50 text-slate-800 font-medium text-sm rounded-lg border border-slate-200 shadow-sm hover:shadow-sm transition-all"
+          >
+            View Live Traces
+          </Link>
+        </div>
+      </div>
+
       {/* Top Search & Upload Quick Bar (Matching reference header layout) */}
-      <div className="soft-card p-4 space-y-4">
+      <div id="upload-card" className="soft-card p-5 space-y-4 scroll-mt-24">
         <form onSubmit={handleUpload} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-          <div className="md:col-span-4 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+          <div className="md:col-span-4 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Tender Title / Name</label>
             <input 
               type="text"
@@ -93,7 +117,7 @@ export default function HomePage() {
             />
           </div>
 
-          <div className="md:col-span-3 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+          <div className="md:col-span-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Buyer Authority</label>
             <input 
               type="text"
@@ -104,13 +128,13 @@ export default function HomePage() {
             />
           </div>
 
-          <div className="md:col-span-3 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+          <div className="md:col-span-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Upload Tender Document</label>
             <input 
               type="file"
               accept=".pdf,.txt,.doc,.docx"
               onChange={(e) => setFileInput(e.target.files?.[0] || null)}
-              className="text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-200 file:text-slate-800 hover:file:bg-slate-300"
+              className="text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-200 file:text-slate-800 hover:file:bg-slate-300"
             />
           </div>
 
@@ -118,7 +142,7 @@ export default function HomePage() {
             <button
               type="submit"
               disabled={uploading}
-              className="w-full h-14 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all disabled:opacity-50"
+              className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-50"
             >
               {uploading ? <Sparkles className="h-4 w-4 animate-spin text-white" /> : <Plus className="h-4 w-4" />}
               {uploading ? 'Processing' : 'Create Workspace'}
@@ -132,13 +156,13 @@ export default function HomePage() {
         {/* LEFT COLUMN: Filter Panel Card (~3 Columns) */}
         <div className="lg:col-span-3 soft-card p-5 space-y-6">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <h2 className="font-bold text-lg text-slate-900 flex items-center gap-2">
-              <Filter className="h-5 w-5 text-indigo-600" />
+            <h2 className="font-bold text-base tracking-tight text-slate-900 flex items-center gap-2">
+              <Filter className="h-5 w-5 text-blue-600" />
               Filters
             </h2>
             <button 
               onClick={() => { setSearchFilter(''); setStatusFilter('all'); }}
-              className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+              className="text-xs font-semibold text-blue-600 hover:text-blue-800"
             >
               Reset
             </button>
@@ -154,7 +178,7 @@ export default function HomePage() {
                 placeholder="Search tenders..."
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-blue-500"
               />
             </div>
           </div>
@@ -170,7 +194,7 @@ export default function HomePage() {
                     name="status"
                     checked={statusFilter === st}
                     onChange={() => setStatusFilter(st)}
-                    className="accent-indigo-600 h-4 w-4"
+                    className="accent-blue-600 h-4 w-4"
                   />
                   <span className="capitalize">{st === 'all' ? 'All Statuses' : st}</span>
                 </label>
@@ -179,16 +203,16 @@ export default function HomePage() {
           </div>
 
           {/* AI Metrics Summary Box */}
-          <div className="bg-indigo-50/60 border border-indigo-100 p-4 rounded-2xl space-y-2 text-xs">
-            <span className="font-bold text-indigo-900 block">Nebius Nemotron Stats</span>
+          <div className="bg-blue-50/60 border border-blue-100 p-4 rounded-xl space-y-2 text-xs">
+            <span className="font-bold text-blue-900 block">Nebius Nemotron Stats</span>
             <div className="text-slate-600 space-y-1">
               <div className="flex justify-between"><span>Avg Processing:</span> <strong className="text-slate-900">&lt; 20 min</strong></div>
-              <div className="flex justify-between"><span>Model Routing:</span> <strong className="text-indigo-600">85% Nano/Super</strong></div>
+              <div className="flex justify-between"><span>Model Routing:</span> <strong className="text-blue-600">85% Nano/Super</strong></div>
               <div className="flex justify-between"><span>Tavily Research:</span> <strong className="text-emerald-600">Active</strong></div>
             </div>
           </div>
 
-          <button className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-md transition-colors">
+          <button className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 px-4 rounded-xl text-xs shadow-sm transition-colors">
             Apply Filters
           </button>
         </div>
@@ -197,13 +221,13 @@ export default function HomePage() {
         <div className="lg:col-span-9 space-y-4">
           {/* Header Badge Pills Row (Matching reference pill layout) */}
           <div className="flex items-center gap-2">
-            <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#ff5722] text-white shadow-sm">
+            <span className="px-3 py-1 rounded-md text-xs font-semibold bg-[#ff5722] text-white shadow-sm">
               Cheapest & Best Fit
             </span>
-            <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-600 text-white shadow-sm">
+            <span className="px-3 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow-sm">
               Recommended (AI Ultra)
             </span>
-            <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700">
+            <span className="px-3 py-1 rounded-md text-xs font-medium bg-slate-200/80 text-slate-700">
               {filteredTenders.length} tenders available
             </span>
           </div>
@@ -219,29 +243,29 @@ export default function HomePage() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase tracking-wider">
+                      <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wider">
                         {tender.buyer}
                       </span>
-                      <span className="text-xs font-semibold text-slate-400 font-mono">
+                      <span className="text-xs font-normal text-slate-400 font-mono">
                         {tender.file_name}
                       </span>
                     </div>
-                    <h3 className="text-xl font-extrabold text-slate-900">
+                    <h3 className="text-lg font-bold tracking-tight text-slate-900">
                       {tender.title}
                     </h3>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                    <span className={`px-2.5 py-1 rounded-md text-xs font-semibold border ${
                       tender.status === 'Ready' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                      tender.status === 'Decided' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
+                      tender.status === 'Decided' ? 'bg-blue-50 text-blue-700 border-blue-200' :
                       'bg-slate-100 text-slate-600 border-slate-200'
                     }`}>
                       {tender.status}
                     </span>
                     <Link
                       href={`/tenders/${tender._id}`}
-                      className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition-colors"
+                      className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
                     >
                       Select & Open Workspace
                       <ArrowRight className="h-4 w-4" />
@@ -252,11 +276,11 @@ export default function HomePage() {
                 {/* Timeline / Highlights Row */}
                 <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-600 font-medium">
                   <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1"><Layers className="h-4 w-4 text-indigo-600" /> {tender.total_pages || 10} Pages</span>
+                    <span className="flex items-center gap-1"><Layers className="h-4 w-4 text-blue-600" /> {tender.total_pages || 10} Pages</span>
                     <span className="flex items-center gap-1"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Grounded Evidence</span>
                     <span className="flex items-center gap-1"><Sparkles className="h-4 w-4 text-orange-500" /> Tavily Search</span>
                   </div>
-                  <span className="text-indigo-600 font-bold">100% Citation Guarantee</span>
+                  <span className="text-blue-600 font-bold">100% Citation Guarantee</span>
                 </div>
               </div>
             ))

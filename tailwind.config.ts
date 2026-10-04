@@ -52,6 +52,18 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      fontFamily: {
+        sans: ['var(--font-inter)', 'Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+      },
+      letterSpacing: {
+        tighter: '-0.04em',
+        tight: '-0.03em',
+        snug: '-0.015em',
+        normal: '-0.011em',
+        wide: '0.025em',
+        wider: '0.05em',
+        widest: '0.1em',
+      },
       borderRadius: {
         '3xl': '1.5rem',
         '2xl': '1.25rem',
